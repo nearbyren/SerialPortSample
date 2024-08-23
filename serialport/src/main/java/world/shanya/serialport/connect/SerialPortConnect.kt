@@ -207,6 +207,7 @@ internal object SerialPortConnect {
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
             val value = characteristic?.value
+            println("我来了 onCharacteristicChanged")
             if (value != null && value.isNotEmpty()) {
                 val receivedData = if (SerialPort.readDataType == SerialPort.READ_STRING) {
                     SerialPortTools.bytes2string(value, "GBK")
