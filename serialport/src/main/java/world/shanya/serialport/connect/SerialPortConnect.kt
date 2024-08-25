@@ -18,26 +18,28 @@ import world.shanya.serialport.tools.SerialPortTools
 import world.shanya.serialport.tools.ToastUtil
 import java.io.IOException
 import java.io.InputStream
-import java.lang.NullPointerException
-import java.lang.RuntimeException
 import java.util.*
 import java.util.logging.Logger
-import kotlin.collections.HashMap
 
 
 //新连接状态接口
 typealias ConnectionStatusCallback = (status: Boolean, bluetoothDevice: BluetoothDevice?) -> Unit
 //旧连接状态接口
-@Deprecated(message = "该回调在4.0.0版本开始被弃用",replaceWith = ReplaceWith(expression = "ConnectionStatusCallback"))
+@Deprecated(
+    message = "该回调在4.0.0版本开始被弃用",
+    replaceWith = ReplaceWith(expression = "ConnectionStatusCallback")
+)
 typealias ConnectStatusCallback = (status: Boolean, device: Device) -> Unit
 //连接接口
 typealias ConnectCallback = () -> Unit
 //连接结果接口
-@Deprecated(message = "该方法在4.2.0版本开始被弃用",replaceWith = ReplaceWith("ConnectionStatusCallback"))
+@Deprecated(
+    message = "该方法在4.2.0版本开始被弃用",
+    replaceWith = ReplaceWith("ConnectionStatusCallback")
+)
 typealias ConnectionResultCallback = (result: Boolean, bluetoothDevice: BluetoothDevice?) -> Unit
 //Ble device can work callback
 typealias BleCanWorkCallback = () -> Unit
-
 
 
 /**
@@ -54,28 +56,40 @@ internal object SerialPortConnect {
 
     //传统设备UUID
     internal var UUID_LEGACY = "00001101-0000-1000-8000-00805F9B34FB"
+
     //BLE设备UUID
-    internal var UUID_BLE = "0000ffe1-0000-1000-8000-00805f9b34fb"
+    internal var UUID_BLE = "5833ff01-9b8b-5191-6142-22a4536ef123"
+
     //BLE 接收UUID
-    internal var UUID_BLE_READ = "49535343-1e4d-4bd9-ba61-23c647249616"
+    internal var UUID_BLE_READ = "5833ff03-9b8b-5191-6142-22a4536ef123"
+
     //BLE 发送UUID
-    internal var UUID_BLE_SEND = "49535343-8841-43f4-a8d4-ecbe34729bb3"
+    internal var UUID_BLE_SEND = "5833ff02-9b8b-5191-6142-22a4536ef123"
+
     //是否开启间隔自动重连
     internal var autoReconnectAtIntervalsFlag = false
+
     //开启间隔自动重连时间间隔 单位ms
     internal var autoReconnectIntervalsTime = 10000
+
     //蓝牙通信Socket
-    internal var bluetoothSocket: BluetoothSocket?= null
+    internal var bluetoothSocket: BluetoothSocket? = null
+
     //蓝牙通信inputStream
-    internal var inputStream: InputStream?= null
+    internal var inputStream: InputStream? = null
+
     //连接状态
     internal var connectStatus = false
+
     //自动连接标志（执行自动连接后即为 true）
     internal var autoConnectFlag = false
+
     //已经连接的传统设备
-    internal var connectedLegacyDevice: BluetoothDevice ?= null
+    internal var connectedLegacyDevice: BluetoothDevice? = null
+
     //已经连接的BLE设备
-    internal var connectedBleDevice: BluetoothDevice ?= null
+    internal var connectedBleDevice: BluetoothDevice? = null
+
     //上一次成功连接的设备地址
     internal var lastDeviceAddress = ""
 
@@ -87,6 +101,7 @@ internal object SerialPortConnect {
     internal var gattCharacteristicList = HashMap<String, Int>()
 
     internal var gattServiceList = HashMap<String, HashMap<String, Int>>()
+
     /**
      * bluetoothGattCallback BLE设备连接回调
      * @Author Shanya
@@ -100,12 +115,9 @@ internal object SerialPortConnect {
             LogUtil.log("MTU", mtu.toString())
         }
 
-        override fun onDescriptorWrite(
-            gatt: BluetoothGatt?,
-            descriptor: BluetoothGattDescriptor?,
-            status: Int
-        ) {
+        override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
             super.onDescriptorWrite(gatt, descriptor, status)
+            println("我来了 onDescriptorWrite gatt=$gatt,uuid=${descriptor?.uuid},status=${status}")
             SerialPort.bleCanWorkCallback?.invoke()
         }
 
@@ -121,12 +133,37 @@ internal object SerialPortConnect {
             if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 if (connectedBleDevice == null) {
                     connectedResult(SerialPort.newContext, false, gatt, gatt?.device)
-                }else {
+                } else {
                     disconnectResult(SerialPort.newContext)
                     gatt?.close()
                 }
             }
         }
+//        val test = "00001800-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a00-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a01-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a04-0000-1000-8000-00805f9b34fb"
+//
+//        val test = "00001801-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a05-0000-1000-8000-00805f9b34fb"
+
+        val test = "0000180a-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a23-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a24-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a25-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a26-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a27-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a28-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a29-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a2a-0000-1000-8000-00805f9b34fb"
+//        val test = "00002a50-0000-1000-8000-00805f9b34fb"
+
+//        val test = "5833ff01-9b8b-5191-6142-22a4536ef123"
+//        val test = "5833ff03-9b8b-5191-6142-22a4536ef123"
+//
+//        val test = "55535343-fe7d-4ae5-8fa9-9fafd205e455"
+//        val test = "49535343-1e4d-4bd9-ba61-23c647249616"
+
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             super.onServicesDiscovered(gatt, status)
@@ -135,79 +172,202 @@ internal object SerialPortConnect {
                 gatt?.services?.let {
                     for (gattService in it) {
                         val gattCharacteristics = gattService.characteristics
+                        println("我来了 UUID1=${gattService.uuid}")
                         for (gattCharacteristic in gattCharacteristics) {
                             val uuid = gattCharacteristic.uuid.toString()
-                            println("我来了 UUID=$uuid")
+                            val charaProp: Int = gattCharacteristic.properties
+                            if (charaProp and BluetoothGattCharacteristic.PROPERTY_INDICATE != 0) {
+                                if (gatt.setCharacteristicNotification(gattCharacteristic, true)) {
+                                    println("我来了 INDICATE =PROPERTY_INDICATE")
+//                                    for (t in gattCharacteristic.descriptors) {
+//                                        t.value =
+//                                            BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+//                                        bluetoothGatt?.writeDescriptor(t)
+//                                    }
+                                }
+                            } else if (charaProp and BluetoothGattCharacteristic.PROPERTY_READ != 0) {
+
+                            } else if (charaProp and BluetoothGattCharacteristic.PROPERTY_WRITE != 0) {
+
+                            } else if (charaProp and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0) {
+
+                            } else if (charaProp and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0) {
+                                if (gatt.setCharacteristicNotification(gattCharacteristic, true)) {
+                                    println("我来了 INDICATE =PROPERTY_NOTIFY")
+//                                    for (t in gattCharacteristic.descriptors) {
+//                                        t.value =
+//                                            BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+//                                        bluetoothGatt?.writeDescriptor(t)
+//                                    }
+                                }
+                            }
+                            println("我来了 UUID2=$uuid")
                             val properties = gattCharacteristic.properties
                             gattCharacteristicList[uuid] = properties
-                            if (UUID_BLE_SEND == "") {
-                                if (uuid == UUID_BLE) {
-                                    this@SerialPortConnect.sendGattCharacteristic = gattCharacteristic
-                                }
-                            } else {
-                                if (uuid == UUID_BLE_SEND) {
-                                    println("我来了 进来了1 ")
-                                    this@SerialPortConnect.sendGattCharacteristic = gattCharacteristic
-                                }
+                            if("5833ff02-9b8b-5191-6142-22a4536ef123"==uuid){
+                                println("我来了 写入")
+                                this@SerialPortConnect.sendGattCharacteristic =
+                                        gattCharacteristic
                             }
-                            if (UUID_BLE_READ == "") {
-                                if (uuid == UUID_BLE) {
-                                    this@SerialPortConnect.readGattCharacteristic = gattCharacteristic
-                                }
+
+//                            if("00002a05-0000-1000-8000-00805f9b34fb"==uuid){
+//                                println("我来了 Indicate")
+//                                this@SerialPortConnect.readGattCharacteristic =
+//                                    gattCharacteristic
+//                                gatt?.readCharacteristic(gattCharacteristic);
+//                            }
+
+                            if(test==uuid){
+                                println("我来了 读")
+                                this@SerialPortConnect.readGattCharacteristic =
+                                    gattCharacteristic
+                                gatt?.readCharacteristic(gattCharacteristic)
                             }
-                            else {
-                                if (uuid == UUID_BLE_READ) {
-                                    println("我来了 进来了2 ")
-                                    this@SerialPortConnect.readGattCharacteristic = gattCharacteristic
-                                }
-                            }
+
+//                             if("00002a00-0000-1000-8000-00805f9b34fb"==uuid){
+//                                println("我来了 读")
+//                                this@SerialPortConnect.readGattCharacteristic =
+//                                    gattCharacteristic
+//                                gatt?.readCharacteristic(gattCharacteristic)
+//                            }
+
+//                            if("00002a23-0000-1000-8000-00805f9b34fb"==uuid){
+//                                println("我来了 读")
+//                                this@SerialPortConnect.readGattCharacteristic =
+//                                    gattCharacteristic
+//                                gatt?.readCharacteristic(gattCharacteristic)
+//                            }
+////
+//                            if("5833ff03-9b8b-5191-6142-22a4536ef123"==uuid){
+//                                println("我来了 notify")
+//                                this@SerialPortConnect.readGattCharacteristic =
+//                                    gattCharacteristic
+//                                gatt?.readCharacteristic(gattCharacteristic);
+//                            }
+
+//                            if("49535343-1e4d-4bd9-ba61-23c647249616"==uuid){
+//                                println("我来了 读 通知")
+//                                this@SerialPortConnect.readGattCharacteristic =
+//                                    gattCharacteristic
+//                                gatt?.readCharacteristic(gattCharacteristic);
+//                            }
+
+
+
+//                            if (UUID_BLE_SEND == "") {
+//                                if (uuid == UUID_BLE) {
+//                                    this@SerialPortConnect.sendGattCharacteristic =
+//                                        gattCharacteristic
+//                                }
+//                            } else {
+//                                if (uuid == UUID_BLE_SEND) {
+//                                    println("我来了 进来了1 ")
+//                                    this@SerialPortConnect.sendGattCharacteristic =
+//                                        gattCharacteristic
+//                                }
+//                            }
+//                            if (UUID_BLE_READ == "") {
+//                                if (uuid == UUID_BLE) {
+//                                    this@SerialPortConnect.readGattCharacteristic =
+//                                        gattCharacteristic
+//                                }
+//                            } else {
+//                                if (uuid == UUID_BLE_READ) {
+//                                    println("我来了 进来了2 ")
+//                                    this@SerialPortConnect.readGattCharacteristic =
+//                                        gattCharacteristic
+//                                }
+//                            }
                         }
                         gattServiceList[gattService.uuid.toString()] = gattCharacteristicList
                     }
+
                 }
             }
-            try {
-                val isEnableNotify = gatt?.setCharacteristicNotification(readGattCharacteristic, true)
-                if (isEnableNotify == true) {
-                    val descriptorsList = readGattCharacteristic?.descriptors
-                    descriptorsList?.let {
-                        if (it.size > 0) {
-                            for (descriptors in it) {
-                                descriptors.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                                bluetoothGatt?.writeDescriptor(descriptors)
-                            }
-                        }
-                    }
-                }
-            } catch (e: NullPointerException) {
-                Log.e("SerialPort", "BLE接收UUID不正确，请检查！")
-                throw RuntimeException("BLE接收UUID不正确，请检查！")
-            }
+
+            val isEnableNotify =
+                    gatt?.setCharacteristicNotification(readGattCharacteristic, true)
+            println("我来了 进来了3 isEnableNotify $isEnableNotify")
+         val readDe=   readGattCharacteristic?.getDescriptor(UUID.fromString(test))
+            readDe?.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            gatt?.writeDescriptor(readDe)
+
+//            try {
+//                val isEnableNotify =
+//                    gatt?.setCharacteristicNotification(readGattCharacteristic, true)
+//                println("我来了 进来了3 ")
+//                if (isEnableNotify == true) {
+//                    println("我来了 进来了4 ")
+//                    val descriptorsList = readGattCharacteristic?.descriptors
+//                    descriptorsList?.let {
+//                        if (it.size > 0) {
+//                            println("我来了 进来了5 ")
+//                            for (descriptors in it) {
+//                                descriptors.value =
+//                                    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+//                                bluetoothGatt?.writeDescriptor(descriptors)
+//
+//                            }
+//                        }else{
+//                            println("我来了 进来了5 else $descriptorsList")
+//                        }
+//                    }
+//                }
+//            } catch (e: NullPointerException) {
+//                Log.e("SerialPort", "BLE接收UUID不正确，请检查！")
+//                throw RuntimeException("BLE接收UUID不正确，请检查！")
+//            }
         }
 
-        override fun onCharacteristicWrite(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
-            status: Int
-        ) {
+        private fun findNotifyCharacteristic(
+            service: BluetoothGattService,
+            characteristicUUID: UUID
+        ): BluetoothGattCharacteristic? {
+            var characteristic: BluetoothGattCharacteristic? = null
+            val characteristics = service.characteristics
+            for (c in characteristics) {
+                if ((c.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0
+                    && (characteristicUUID == c.uuid)
+                ) {
+                    characteristic = c
+                    break
+                }
+            }
+            if (characteristic != null) return characteristic
+            for (c in characteristics) {
+                if ((c.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0
+                    && (characteristicUUID == c.uuid)
+                ) {
+                    characteristic = c
+                    break
+                }
+            }
+            return characteristic
+        }
+
+        override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 LogUtil.log("BLE设备发送数据成功")
+                println("我来了 BLE设备发送数据成功")
 
-            }
-            else if (status == BluetoothGatt.GATT_FAILURE) {
+            } else if (status == BluetoothGatt.GATT_FAILURE) {
                 LogUtil.log("BLE设备发送数据失败")
+                println("我来了 BLE设备发送数据失败")
             }
         }
 
+        override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
+            super.onCharacteristicRead(gatt, characteristic, status)
+            val value =  SerialPortTools.bytes2string(characteristic?.value, "GBK")
+            println("我来了 onCharacteristicRead $gatt,${value},status=$status")
+        }
 
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?
-        ) {
+
+        override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
             super.onCharacteristicChanged(gatt, characteristic)
-            val value = characteristic?.value
             println("我来了 onCharacteristicChanged")
+            val value = characteristic?.value
             if (value != null && value.isNotEmpty()) {
                 val receivedData = if (SerialPort.readDataType == SerialPort.READ_STRING) {
                     SerialPortTools.bytes2string(value, "GBK")
@@ -286,7 +446,7 @@ internal object SerialPortConnect {
      * @Version 4.1.4
      */
     internal fun _connectLegacy(context: Context, address: String) {
-        var bluetoothDevice:BluetoothDevice ?= null
+        var bluetoothDevice: BluetoothDevice? = null
         try {
             bluetoothDevice =
                 SerialPort.bluetoothAdapter.getRemoteDevice(address)
@@ -345,12 +505,7 @@ internal object SerialPortConnect {
      * @Date 2021-7-21
      * @Version 4.0.0
      */
-    private fun connectedResult(
-        context: Context?,
-        result: Boolean,
-        gatt: BluetoothGatt?,
-        bluetoothDevice: BluetoothDevice?
-    ) {
+    private fun connectedResult(context: Context?, result: Boolean, gatt: BluetoothGatt?, bluetoothDevice: BluetoothDevice?) {
         if (result) {
             if (bluetoothDevice?.type == 2) {
                 bluetoothGatt = gatt
@@ -359,7 +514,8 @@ internal object SerialPortConnect {
             val device = Device(
                 bluetoothDevice?.name ?: "",
                 bluetoothDevice?.address ?: "",
-                bluetoothDevice?.type ?: 1)
+                bluetoothDevice?.type ?: 1
+            )
             connectStatus = true
             SerialPort.connectCallback?.invoke()
             SerialPort.connectStatusCallback?.invoke(true, device)
@@ -367,14 +523,14 @@ internal object SerialPortConnect {
             SerialPort.connectionResultCallback?.invoke(true, bluetoothDevice)
             if (bluetoothDevice?.type == 2) {
                 connectedBleDevice = bluetoothDevice
-                LogUtil.log("连接BLE设备成功","设备地址: ${bluetoothDevice.address}")
+                LogUtil.log("连接BLE设备成功", "设备地址: ${bluetoothDevice.address}")
             } else {
                 connectedLegacyDevice = bluetoothDevice
-                LogUtil.log("连接传统设备成功","设备地址: ${bluetoothDevice?.address}")
+                LogUtil.log("连接传统设备成功", "设备地址: ${bluetoothDevice?.address}")
             }
             context?.let {
                 SPUtil.putDeviceInfo(it, bluetoothDevice)
-                lastDeviceAddress = bluetoothDevice?.address?:""
+                lastDeviceAddress = bluetoothDevice?.address ?: ""
                 ToastUtil.toast(it, SerialPortToast.connectSucceeded)
             }
         } else {
@@ -408,10 +564,10 @@ internal object SerialPortConnect {
             SerialPort.connectionStatusCallback?.invoke(false, it)
             connectStatus = false
             connectedBleDevice = null
-            context?.let {context ->
-                ToastUtil.toast(context,SerialPortToast.disconnect)
+            context?.let { context ->
+                ToastUtil.toast(context, SerialPortToast.disconnect)
             }
-            LogUtil.log("断开BLE设备连接","设备地址: ${it.address}")
+            LogUtil.log("断开BLE设备连接", "设备地址: ${it.address}")
         }
         connectedLegacyDevice?.let {
             val device = Device(it.name, it.address, it.type)
@@ -419,10 +575,10 @@ internal object SerialPortConnect {
             SerialPort.connectionStatusCallback?.invoke(false, it)
             connectStatus = false
             connectedLegacyDevice = null
-            context?.let {context ->
-                ToastUtil.toast(context,SerialPortToast.disconnect)
+            context?.let { context ->
+                ToastUtil.toast(context, SerialPortToast.disconnect)
             }
-            LogUtil.log("断开传统设备连接","设备地址: ${it.address}")
+            LogUtil.log("断开传统设备连接", "设备地址: ${it.address}")
         }
     }
 
@@ -440,10 +596,10 @@ internal object SerialPortConnect {
     private val runnable = object : Runnable {
         override fun run() {
             if (autoReconnectAtIntervalsFlag && !connectStatus) {
-                SerialPort.newContext?.let {context ->
+                SerialPort.newContext?.let { context ->
                     if (lastDeviceAddress != "") {
-                        LogUtil.log("间隔自动重连","设备地址: ${lastDeviceAddress}")
-                        SPUtil.getDeviceType(context)?.let {type ->
+                        LogUtil.log("间隔自动重连", "设备地址: ${lastDeviceAddress}")
+                        SPUtil.getDeviceType(context)?.let { type ->
                             when (type) {
                                 "1" -> {
                                     SPUtil.getDeviceAddress(context)?.let {
@@ -451,12 +607,14 @@ internal object SerialPortConnect {
                                         _connectLegacy(context, lastDeviceAddress)
                                     }
                                 }
+
                                 "2" -> {
                                     SPUtil.getDeviceAddress(context)?.let {
                                         lastDeviceAddress = it
                                         connectBle(context, lastDeviceAddress)
                                     }
                                 }
+
                                 else -> {
 
                                 }
@@ -468,9 +626,11 @@ internal object SerialPortConnect {
             handler.postDelayed(this, autoReconnectIntervalsTime.toLong())
         }
     }
+
     internal fun autoConnect() {
-        handler.postDelayed(runnable,autoReconnectIntervalsTime.toLong())
+        handler.postDelayed(runnable, autoReconnectIntervalsTime.toLong())
     }
+
     internal fun cancelAutoConnect() {
         handler.removeCallbacks(runnable)
     }
@@ -482,7 +642,7 @@ internal object SerialPortConnect {
      * Requires android.Manifest.permission.BLUETOOTH permission.
      * Returns:true, if the new MTU value has been requested successfully
      */
-    fun requestMtu(mtu: Int):Boolean {
+    fun requestMtu(mtu: Int): Boolean {
         val boolean = bluetoothGatt?.requestMtu(mtu) == false
         Thread.sleep(600)
         return boolean
