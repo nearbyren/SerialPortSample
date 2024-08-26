@@ -75,6 +75,8 @@ public class SerialPortTools {
                     gattCharacteristic.setValue(data);
                      Boolean bool =    gatt.writeCharacteristic(gattCharacteristic);
                     System.out.println("我来了 发送数据成功："+bool);
+
+
                 } else {
                     Log.e("SerialPort", "BLE接收UUID不正确，请检查！");
                     throw new NullPointerException("BLE接收UUID不正确，请检查！");

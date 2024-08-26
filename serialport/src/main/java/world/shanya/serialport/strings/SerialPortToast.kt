@@ -6,6 +6,12 @@ import world.shanya.serialport.R
 object SerialPortToast {
     fun get() = this
 
+    var test2222 = SerialPortToastBean(true, R.string.test2222,Toast.LENGTH_SHORT)
+    var test1111 = SerialPortToastBean(true, R.string.test1111,Toast.LENGTH_SHORT)
+    var test = SerialPortToastBean(true, R.string.test,Toast.LENGTH_SHORT)
+    var testff = SerialPortToastBean(true, R.string.testff,Toast.LENGTH_SHORT)
+    var test2 = SerialPortToastBean(true, R.string.test2,Toast.LENGTH_SHORT)
+    var test3 = SerialPortToastBean(true, R.string.test3,Toast.LENGTH_SHORT)
     var connectSucceeded = SerialPortToastBean(true, R.string.connectSucceededToast,Toast.LENGTH_SHORT)
     var connectFailed = SerialPortToastBean(true,R.string.connectFailedToast,Toast.LENGTH_SHORT)
     var disconnect = SerialPortToastBean(true,R.string.disconnectToast,Toast.LENGTH_SHORT)

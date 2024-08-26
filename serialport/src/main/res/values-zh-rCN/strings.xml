@@ -8,6 +8,12 @@
   -->
 
 <resources>
+    <string name="test2222">onCharacteristicChanged </string>
+    <string name="test1111">读到数据了 </string>
+    <string name="test">BLE设备发送数据成功 </string>
+    <string name="testff">BLE设备发送数据失败</string>
+    <string name="test2">发送失败 </string>
+    <string name="test3">发送失败 </string>
     <string name="connectSucceededToast">连接成功</string>
     <string name="connectFailedToast">连接失败</string>
     <string name="disconnectToast">断开连接</string>

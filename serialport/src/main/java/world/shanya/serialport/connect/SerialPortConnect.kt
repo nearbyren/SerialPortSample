@@ -5,7 +5,6 @@ import android.bluetooth.*
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
-import android.util.Log
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import world.shanya.serialport.SerialPort
@@ -19,7 +18,6 @@ import world.shanya.serialport.tools.ToastUtil
 import java.io.IOException
 import java.io.InputStream
 import java.util.*
-import java.util.logging.Logger
 
 
 //新连接状态接口
@@ -115,7 +113,11 @@ internal object SerialPortConnect {
             LogUtil.log("MTU", mtu.toString())
         }
 
-        override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt?,
+            descriptor: BluetoothGattDescriptor?,
+            status: Int
+        ) {
             super.onDescriptorWrite(gatt, descriptor, status)
             println("我来了 onDescriptorWrite gatt=$gatt,uuid=${descriptor?.uuid},status=${status}")
             SerialPort.bleCanWorkCallback?.invoke()
@@ -147,7 +149,7 @@ internal object SerialPortConnect {
 //        val test = "00001801-0000-1000-8000-00805f9b34fb"
 //        val test = "00002a05-0000-1000-8000-00805f9b34fb"
 
-        val test = "0000180a-0000-1000-8000-00805f9b34fb"
+//        val test = "0000180a-0000-1000-8000-00805f9b34fb"
 //        val test = "00002a23-0000-1000-8000-00805f9b34fb"
 //        val test = "00002a24-0000-1000-8000-00805f9b34fb"
 //        val test = "00002a25-0000-1000-8000-00805f9b34fb"
@@ -158,11 +160,12 @@ internal object SerialPortConnect {
 //        val test = "00002a2a-0000-1000-8000-00805f9b34fb"
 //        val test = "00002a50-0000-1000-8000-00805f9b34fb"
 
-//        val test = "5833ff01-9b8b-5191-6142-22a4536ef123"
+        //        val test = "5833ff01-9b8b-5191-6142-22a4536ef123"
 //        val test = "5833ff03-9b8b-5191-6142-22a4536ef123"
 //
 //        val test = "55535343-fe7d-4ae5-8fa9-9fafd205e455"
-//        val test = "49535343-1e4d-4bd9-ba61-23c647249616"
+        val testWrite = "49535343-1e4d-4bd9-ba61-23c647249616"
+        val testRead = "495353438841-43f4-a8d4-ecbe34729bb3"
 
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
@@ -204,10 +207,10 @@ internal object SerialPortConnect {
                             println("我来了 UUID2=$uuid")
                             val properties = gattCharacteristic.properties
                             gattCharacteristicList[uuid] = properties
-                            if("5833ff02-9b8b-5191-6142-22a4536ef123"==uuid){
+                            if (testWrite == uuid) {
                                 println("我来了 写入")
                                 this@SerialPortConnect.sendGattCharacteristic =
-                                        gattCharacteristic
+                                    gattCharacteristic
                             }
 
 //                            if("00002a05-0000-1000-8000-00805f9b34fb"==uuid){
@@ -217,7 +220,7 @@ internal object SerialPortConnect {
 //                                gatt?.readCharacteristic(gattCharacteristic);
 //                            }
 
-                            if(test==uuid){
+                            if (testRead == uuid) {
                                 println("我来了 读")
                                 this@SerialPortConnect.readGattCharacteristic =
                                     gattCharacteristic
@@ -253,7 +256,6 @@ internal object SerialPortConnect {
 //                            }
 
 
-
 //                            if (UUID_BLE_SEND == "") {
 //                                if (uuid == UUID_BLE) {
 //                                    this@SerialPortConnect.sendGattCharacteristic =
@@ -286,9 +288,9 @@ internal object SerialPortConnect {
             }
 
             val isEnableNotify =
-                    gatt?.setCharacteristicNotification(readGattCharacteristic, true)
+                gatt?.setCharacteristicNotification(readGattCharacteristic, true)
             println("我来了 进来了3 isEnableNotify $isEnableNotify")
-         val readDe=   readGattCharacteristic?.getDescriptor(UUID.fromString(test))
+            val readDe = readGattCharacteristic?.getDescriptor(UUID.fromString(testRead))
             readDe?.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
             gatt?.writeDescriptor(readDe)
 
@@ -345,28 +347,51 @@ internal object SerialPortConnect {
             return characteristic
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
+
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 LogUtil.log("BLE设备发送数据成功")
                 println("我来了 BLE设备发送数据成功")
-
+                SerialPort.newContext?.let {
+                    ToastUtil.toast(it, SerialPortToast.test)
+                }
             } else if (status == BluetoothGatt.GATT_FAILURE) {
                 LogUtil.log("BLE设备发送数据失败")
                 println("我来了 BLE设备发送数据失败")
+                SerialPort.newContext?.let {
+                    ToastUtil.toast(it, SerialPortToast.testff)
+                }
             }
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
             super.onCharacteristicRead(gatt, characteristic, status)
-            val value =  SerialPortTools.bytes2string(characteristic?.value, "GBK")
+            val value = SerialPortTools.bytes2string(characteristic?.value, "GBK")
             println("我来了 onCharacteristicRead $gatt,${value},status=$status")
+            SerialPort.newContext?.let {
+                ToastUtil.toast(it, SerialPortToast.test1111)
+            }
         }
 
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
             super.onCharacteristicChanged(gatt, characteristic)
             println("我来了 onCharacteristicChanged")
+            SerialPort.newContext?.let {
+                ToastUtil.toast(it, SerialPortToast.test2222)
+            }
             val value = characteristic?.value
             if (value != null && value.isNotEmpty()) {
                 val receivedData = if (SerialPort.readDataType == SerialPort.READ_STRING) {
@@ -505,7 +530,12 @@ internal object SerialPortConnect {
      * @Date 2021-7-21
      * @Version 4.0.0
      */
-    private fun connectedResult(context: Context?, result: Boolean, gatt: BluetoothGatt?, bluetoothDevice: BluetoothDevice?) {
+    private fun connectedResult(
+        context: Context?,
+        result: Boolean,
+        gatt: BluetoothGatt?,
+        bluetoothDevice: BluetoothDevice?
+    ) {
         if (result) {
             if (bluetoothDevice?.type == 2) {
                 bluetoothGatt = gatt
